@@ -7,6 +7,8 @@ float schlaegerYPos=0;
 float puckRadius=30;
 float schlaegerRadius=50;
 float schlaegerStop=0;
+float schlaegerBeruehrt;
+float SCHUSSS=0;
 int score1=0;
 int score2=0;
 
@@ -30,10 +32,17 @@ void draw(){
   line(0,displayHeight/3,0,(displayHeight/3)*2);
   line(displayWidth,displayHeight/3,displayWidth,(displayHeight/3)*2);
   //puck movement
-  puckXPos=puckXPos+puckXSpeed;
-  puckYPos=puckYPos+puckYSpeed;
-  puckXSpeed=puckXSpeed*0.995;
-  puckYSpeed=puckYSpeed*0.995;
+  if(schlaegerBeruehrt==0){
+    puckXPos=puckXPos+puckXSpeed;
+    puckYPos=puckYPos+puckYSpeed;
+    puckXSpeed=puckXSpeed*0.995;
+    puckYSpeed=puckYSpeed*0.995;
+  }else{
+    puckXPos=schlaegerXPos;
+    puckYPos=schlaegerYPos;
+    puckXSpeed=0;
+    puckYSpeed=0;
+  }
   //puck max speed
   if(puckXSpeed>40){
     puckXSpeed=40;
@@ -52,7 +61,7 @@ void draw(){
     schlaegerXPos=schlaegerXPos+(mouseX-schlaegerXPos)*0.3;
     schlaegerYPos=schlaegerYPos+(mouseY-schlaegerYPos)*0.3;
   }else{
-    schlaegerStop=0;
+    schlaegerStop=schlaegerStop-1;
   }
   //puck collision with wall
   if(puckXPos>displayWidth-puckRadius){
@@ -62,6 +71,7 @@ void draw(){
       puckYPos=displayHeight/2;
       puckXSpeed=0;
       puckYSpeed=0;
+      schlaegerBeruehrt=0;
     }else{
       puckXSpeed=-0.9*puckXSpeed;
       puckXPos=puckXPos-3;
@@ -74,6 +84,7 @@ void draw(){
       puckYPos=displayHeight/2;
       puckXSpeed=0;
       puckYSpeed=0;
+      schlaegerBeruehrt=0;
     }else{
       puckXSpeed=-0.9*puckXSpeed;
       puckXPos=puckXPos+3;
@@ -89,12 +100,25 @@ void draw(){
   }
   //puck collision with schlaeger
   if(abs(puckXPos-schlaegerXPos)<puckRadius+schlaegerRadius&&abs(puckYPos-schlaegerYPos)<puckRadius+schlaegerRadius){
-    collision();
+    schlaegerBeruehrt=1;
+    if(mousePressed){
+      SCHUSSS=1;
+      schlaegerStop=10;
+      line(schlaegerXPos,schlaegerYPos,mouseX,mouseY);
+    }else{
+      if(SCHUSSS==1){
+        collision();
+      }
+    }
   }
 }
 
 void collision(){
-  schlaegerStop=1;
-  puckXSpeed=(mouseX-schlaegerXPos)*0.6+(-puckXSpeed)*0.6;
-  puckYSpeed=(mouseY-schlaegerYPos)*0.6+(-puckYSpeed)*0.6;
+  schlaegerStop=10;
+  schlaegerBeruehrt=0;
+  puckXSpeed=(mouseX-puckXPos)*0.3;
+  puckYSpeed=(mouseY-puckYPos)*0.3;
+  puckXPos=puckXPos+(mouseX-puckXPos)*0.6;
+  puckYPos=puckYPos+(mouseY-puckYPos)*0.6;
+  SCHUSSS=0;
 }
